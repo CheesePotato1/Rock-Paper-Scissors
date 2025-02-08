@@ -1,7 +1,5 @@
 import streamlit as st
 import random
-from PIL import Image
-import time
 
 # Set page config
 st.set_page_config(
