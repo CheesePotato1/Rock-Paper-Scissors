@@ -1,0 +1,120 @@
+import streamlit as st
+import random
+from PIL import Image
+import time
+
+# Set page config
+st.set_page_config(
+    page_title="Rock Paper Scissors Game",
+    page_icon="✂️",
+    layout="centered"
+)
+
+# Add custom CSS
+st.markdown("""
+    <style>
+    .big-font {
+        font-size:30px !important;
+        font-weight: bold;
+    }
+    .result-font {
+        font-size:24px !important;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 10px 0;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Initialize session state variables
+if 'computer_choice' not in st.session_state:
+    st.session_state.computer_choice = None
+if 'result' not in st.session_state:
+    st.session_state.result = None
+if 'games_played' not in st.session_state:
+    st.session_state.games_played = 0
+if 'wins' not in st.session_state:
+    st.session_state.wins = 0
+if 'losses' not in st.session_state:
+    st.session_state.losses = 0
+if 'ties' not in st.session_state:
+    st.session_state.ties = 0
+
+def play_game(user_choice):
+    choices = ["rock", "paper", "scissors"]
+    st.session_state.computer_choice = random.choice(choices)
+    st.session_state.games_played += 1
+    
+    # Determine winner
+    if user_choice == st.session_state.computer_choice:
+        st.session_state.result = "It's a tie! 🤝"
+        st.session_state.ties += 1
+    elif (
+        (user_choice == "rock" and st.session_state.computer_choice == "scissors") or
+        (user_choice == "paper" and st.session_state.computer_choice == "rock") or
+        (user_choice == "scissors" and st.session_state.computer_choice == "paper")
+    ):
+        st.session_state.result = "You win! 🎉"
+        st.session_state.wins += 1
+    else:
+        st.session_state.result = "Computer wins! 💻"
+        st.session_state.losses += 1
+
+def reset_game():
+    st.session_state.computer_choice = None
+    st.session_state.result = None
+    st.session_state.games_played = 0
+    st.session_state.wins = 0
+    st.session_state.losses = 0
+    st.session_state.ties = 0
+
+# Main app
+st.markdown("<h1 style='text-align: center;'>Rock Paper Scissors Game ✊ ✋ ✌️</h1>", unsafe_allow_html=True)
+
+# Create three columns for the buttons
+col1, col2, col3 = st.columns(3)
+
+# Add buttons with emojis
+if col1.button("Rock ✊"):
+    play_game("rock")
+if col2.button("Paper ✋"):
+    play_game("paper")
+if col3.button("Scissors ✌️"):
+    play_game("scissors")
+
+# Display results
+if st.session_state.computer_choice:
+    st.markdown("<p class='big-font' style='text-align: center;'>Computer chose: " + 
+                {"rock": "✊", "paper": "✋", "scissors": "✌️"}[st.session_state.computer_choice] +
+                "</p>", unsafe_allow_html=True)
+    
+    result_color = {
+        "You win! 🎉": "background-color: #90EE90",
+        "Computer wins! 💻": "background-color: #FFB6C1",
+        "It's a tie! 🤝": "background-color: #F0E68C"
+    }
+    
+    st.markdown(f"<p class='result-font' style='text-align: center; {result_color[st.session_state.result]}'>{st.session_state.result}</p>", 
+                unsafe_allow_html=True)
+
+# Display stats
+st.markdown("---")
+st.markdown("<h3 style='text-align: center;'>Game Statistics</h3>", unsafe_allow_html=True)
+
+# Create three columns for stats
+stat_col1, stat_col2, stat_col3 = st.columns(3)
+
+with stat_col1:
+    st.metric("Wins", st.session_state.wins)
+with stat_col2:
+    st.metric("Losses", st.session_state.losses)
+with stat_col3:
+    st.metric("Ties", st.session_state.ties)
+
+# Reset button
+if st.button("Reset Game"):
+    reset_game()
+
+# Add footer
+st.markdown("---")
+st.markdown("<p style='text-align: center;'>Made with ❤️ using Streamlit</p>", unsafe_allow_html=True)
